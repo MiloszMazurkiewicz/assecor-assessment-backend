@@ -1,5 +1,8 @@
 package com.assecor.assessment.controller;
 
+import com.assecor.assessment.dto.PersonDto;
+import com.assecor.assessment.dto.PersonInputDto;
+import com.assecor.assessment.dto.PersonMapper;
 import com.assecor.assessment.model.Person;
 import com.assecor.assessment.model.Color;
 import com.assecor.assessment.service.PersonService;
@@ -32,12 +35,17 @@ class PersonControllerTest {
 
     @MockBean
     private PersonService personService;
+    
+    @MockBean
+    private PersonMapper personMapper;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     private Person testPerson1;
     private Person testPerson2;
+    private PersonDto testPersonDto1;
+    private PersonDto testPersonDto2;
 
     @BeforeEach
     void setUp() {
@@ -62,12 +70,18 @@ class PersonControllerTest {
         color2.setId(2L);
         color2.setName("grün");
         testPerson2.setColor(color2);
+        
+        // Setup PersonDto objects
+        testPersonDto1 = new PersonDto(1L, "Hans", "Müller", "67742", "Lauterecken", "blau");
+        testPersonDto2 = new PersonDto(2L, "Peter", "Petersen", "23456", "Neustadt", "grün");
     }
 
     @Test
     void getAllPersons_ShouldReturnAllPersons() throws Exception {
         // Mock the service to return test data
         when(personService.getAllPersons()).thenReturn(List.of(testPerson1, testPerson2));
+        when(personMapper.toDto(testPerson1)).thenReturn(testPersonDto1);
+        when(personMapper.toDto(testPerson2)).thenReturn(testPersonDto2);
         
         mockMvc.perform(get("/persons"))
                 .andExpect(status().isOk())
@@ -78,7 +92,7 @@ class PersonControllerTest {
                 .andExpect(jsonPath("$[0].lastname").value("Müller"))
                 .andExpect(jsonPath("$[0].zipcode").value("67742"))
                 .andExpect(jsonPath("$[0].city").value("Lauterecken"))
-                .andExpect(jsonPath("$[0].color.name").value("blau"));
+                .andExpect(jsonPath("$[0].color").value("blau"));
     }
 
     @Test
@@ -94,7 +108,7 @@ class PersonControllerTest {
                 .andExpect(jsonPath("$.lastname").value("Müller"))
                 .andExpect(jsonPath("$.zipcode").value("67742"))
                 .andExpect(jsonPath("$.city").value("Lauterecken"))
-                .andExpect(jsonPath("$.color.name").value("blau"));
+                .andExpect(jsonPath("$.color").value("blau"));
     }
 
     @Test
@@ -115,40 +129,27 @@ class PersonControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].color.name").value("blau"));
+                .andExpect(jsonPath("$[0].color").value("blau"));
     }
 
     @Test
     void createPerson_ShouldReturnCreatedPerson() throws Exception {
-        Person newPerson = new Person();
-        newPerson.setName("John");
-        newPerson.setLastname("Doe");
-        newPerson.setZipcode("12345");
-        newPerson.setCity("TestCity");
-        Color color = new Color();
-        color.setName("rot");
-        newPerson.setColor(color);
+        PersonInputDto newPersonInputDto = new PersonInputDto(null, "John", "Doe", "12345", "TestCity", "rot");
+        Person newPerson = new Person("John", "Doe", "12345", "TestCity", new Color("rot"));
+        Person savedPerson = new Person(11L, "John", "Doe", "12345", "TestCity", new Color("rot"));
+        PersonDto savedPersonDto = new PersonDto(11L, "John", "Doe", "12345", "TestCity", "rot");
         
-        Person savedPerson = new Person();
-        savedPerson.setId(1L);
-        savedPerson.setName("John");
-        savedPerson.setLastname("Doe");
-        savedPerson.setZipcode("12345");
-        savedPerson.setCity("TestCity");
-        savedPerson.setColor(color);
-
-        // Mock the service to return saved person
+        when(personMapper.toEntity(newPersonInputDto)).thenReturn(newPerson);
         when(personService.createPerson(any(Person.class))).thenReturn(savedPerson);
-
+        when(personMapper.toDto(savedPerson)).thenReturn(savedPersonDto);
+        
         mockMvc.perform(post("/persons")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newPerson)))
+                .content(objectMapper.writeValueAsString(newPersonInputDto)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("John"))
-                .andExpect(jsonPath("$.lastname").value("Doe"))
-                .andExpect(jsonPath("$.zipcode").value("12345"))
-                .andExpect(jsonPath("$.city").value("TestCity"))
-                .andExpect(jsonPath("$.color.name").value("rot"));
+                .andExpect(jsonPath("$.color").value("rot"));
     }
 }

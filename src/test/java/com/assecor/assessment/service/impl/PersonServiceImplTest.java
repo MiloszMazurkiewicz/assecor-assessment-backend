@@ -186,11 +186,11 @@ class PersonServiceImplTest {
         when(personJpaRepository.save(any(Person.class))).thenReturn(savedPerson);
 
         // When
-        Person result = personService.updatePerson(personId, updatedPersonData);
+        Optional<Person> result = personService.updatePerson(personId, updatedPersonData);
 
         // Then
-        assertNotNull(result);
-        assertEquals(savedPerson, result);
+        assertTrue(result.isPresent());
+        assertEquals(savedPerson, result.get());
         verify(personJpaRepository).findById((long) personId);
         verify(personJpaRepository).save(any(Person.class));
     }
@@ -203,11 +203,11 @@ class PersonServiceImplTest {
         
         when(personJpaRepository.findById((long) personId)).thenReturn(Optional.empty());
 
-        // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> personService.updatePerson(personId, updatedPersonData));
+        // When
+        Optional<Person> result = personService.updatePerson(personId, updatedPersonData);
         
-        assertEquals("Person with ID 999 not found", exception.getMessage());
+        // Then
+        assertFalse(result.isPresent());
         verify(personJpaRepository).findById((long) personId);
         verify(personJpaRepository, never()).save(any(Person.class));
     }
@@ -225,11 +225,11 @@ class PersonServiceImplTest {
         when(personJpaRepository.save(any(Person.class))).thenReturn(savedPerson);
 
         // When
-        Person result = personService.updatePerson(personId, personWithColorName);
+        Optional<Person> result = personService.updatePerson(personId, personWithColorName);
 
         // Then
-        assertNotNull(result);
-        assertEquals(savedPerson, result);
+        assertTrue(result.isPresent());
+        assertEquals(savedPerson, result.get());
         verify(colorJpaRepository).findByNameIgnoreCase("blau");
         verify(personJpaRepository).save(any(Person.class));
     }
@@ -241,24 +241,25 @@ class PersonServiceImplTest {
         when(personJpaRepository.findById((long) personId)).thenReturn(Optional.of(testPerson));
 
         // When
-        personService.deletePerson(personId);
+        boolean result = personService.deletePerson(personId);
 
         // Then
+        assertTrue(result);
         verify(personJpaRepository).findById((long) personId);
         verify(personJpaRepository).deleteById((long) personId);
     }
 
     @Test
-    void deletePerson_WhenPersonNotExists_ShouldThrowException() {
+    void deletePerson_WhenPersonNotExists_ShouldReturnFalse() {
         // Given
         int personId = 999;
         when(personJpaRepository.findById((long) personId)).thenReturn(Optional.empty());
 
-        // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> personService.deletePerson(personId));
+        // When
+        boolean result = personService.deletePerson(personId);
         
-        assertEquals("Person with ID 999 not found", exception.getMessage());
+        // Then
+        assertFalse(result);
         verify(personJpaRepository).findById((long) personId);
         verify(personJpaRepository, never()).deleteById(anyLong());
     }

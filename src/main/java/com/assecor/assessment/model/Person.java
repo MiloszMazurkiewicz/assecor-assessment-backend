@@ -1,5 +1,6 @@
 package com.assecor.assessment.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -63,6 +64,20 @@ public class Person {
     
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "color_id", nullable = false)
-    @JsonProperty("color")
+    @JsonIgnore
     private Color color;
+    
+    @JsonProperty("color")
+    public String getColorName() {
+        return color != null ? color.getName() : null;
+    }
+    
+    @JsonProperty("color")
+    public void setColorFromString(String colorName) {
+        if (colorName != null) {
+            Color color = new Color();
+            color.setName(colorName);
+            this.color = color;
+        }
+    }
 }

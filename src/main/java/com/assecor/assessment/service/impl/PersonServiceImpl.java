@@ -100,7 +100,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public Person updatePerson(int id, Person person) {
+    public Optional<Person> updatePerson(int id, Person person) {
         logger.debug("Updating person with ID: {} with data: {}", id, person);
         personUpdateCounter.increment();
         
@@ -108,7 +108,7 @@ public class PersonServiceImpl implements PersonService {
         Optional<Person> existingPerson = personJpaRepository.findById((long) id);
         if (existingPerson.isEmpty()) {
             logger.warn("Person with ID {} not found for update", id);
-            throw new IllegalArgumentException("Person with ID " + id + " not found");
+            return Optional.empty();
         }
         
         // If person has a color with only name, find the Color entity
@@ -122,11 +122,11 @@ public class PersonServiceImpl implements PersonService {
         person.setId((long) id); // Ensure the ID is set correctly
         Person updatedPerson = personJpaRepository.save(person);
         logger.info("Person with ID {} updated successfully", id);
-        return updatedPerson;
+        return Optional.of(updatedPerson);
     }
 
     @Override
-    public void deletePerson(int id) {
+    public boolean deletePerson(int id) {
         logger.debug("Deleting person with ID: {}", id);
         personDeletionCounter.increment();
         
@@ -134,10 +134,11 @@ public class PersonServiceImpl implements PersonService {
         Optional<Person> existingPerson = personJpaRepository.findById((long) id);
         if (existingPerson.isEmpty()) {
             logger.warn("Person with ID {} not found for deletion", id);
-            throw new IllegalArgumentException("Person with ID " + id + " not found");
+            return false;
         }
         
         personJpaRepository.deleteById((long) id);
         logger.info("Person with ID {} deleted successfully", id);
+        return true;
     }
 }

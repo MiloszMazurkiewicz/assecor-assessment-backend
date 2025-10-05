@@ -47,14 +47,15 @@ public interface PersonService {
      * 
      * @param id the person ID
      * @param person the updated person data
-     * @return the updated person
+     * @return Optional containing the updated person if found, empty otherwise
      */
-    Person updatePerson(int id, Person person);
+    Optional<Person> updatePerson(int id, Person person);
     
     /**
      * Deletes a person by ID.
      * 
      * @param id the person ID to delete
+     * @return true if person was deleted, false if not found
      */
-    void deletePerson(int id);
+    boolean deletePerson(int id);
 }
