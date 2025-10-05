@@ -76,12 +76,12 @@ mvn test
 
 ##  Bonus Features Implemented
 
-✅ **Database Normalization**: Separate colors table 
-✅ **CRUD Operations**: Complete person and color management 
-✅ **Metrics Dashboard**: Real-time monitoring UI 
-✅ **Latency Tracking**: Endpoint performance monitoring 
-✅ **API Documentation**: Swagger UI integration 
-✅ **Modern UI**: Responsive metrics dashboard 
+✅ **Database Normalization**: Separate colors table  
+✅ **CRUD Operations**: Complete person and color management  
+✅ **Metrics Dashboard**: Real-time monitoring UI  
+✅ **Latency Tracking**: Endpoint performance monitoring  
+✅ **API Documentation**: Swagger UI integration  
+✅ **Modern UI**: Responsive metrics dashboard  
 ✅ **Comprehensive Logging**: Structured logging with SLF4J 
 
 ## Future Enhancements
