@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Person API Metrics Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        .metric-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .metric-description {
+            color: #666;
+            font-size: 14px;
+        }
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .refresh-btn:hover {
+            background: #5a6fd8;
+        }
+        .endpoint-stats {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .endpoint-stats h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .endpoint-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .endpoint-table th,
+        .endpoint-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .endpoint-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .endpoint-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status-code {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .status-2xx { background-color: #d4edda; color: #155724; }
+        .status-4xx { background-color: #f8d7da; color: #721c24; }
+        .status-5xx { background-color: #f5c6cb; color: #721c24; }
+        .endpoint-links {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .endpoint-links h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .endpoint-links a {
+            display: block;
+            margin: 10px 0;
+            color: #667eea;
+            text-decoration: none;
+        }
+        .endpoint-links a:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            background: #e9ecef;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Person API Metrics Dashboard</h1>
+            <p>Real-time monitoring of your Spring Boot application</p>
+        </div>
+        
+        <button class="refresh-btn" onclick="refreshMetrics()">🔄 Refresh Metrics</button>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">Overview</button>
+            <button class="tab" onclick="showTab('latency')">Endpoint Latency</button>
+        </div>
+        
+        <div id="overview" class="tab-content active">
+            <div class="metrics-grid" id="metricsGrid">
+                <div class="loading">Loading metrics...</div>
+            </div>
+        </div>
+        
+        <div id="latency" class="tab-content">
+            <div class="endpoint-stats">
+                <h3>Endpoint Performance Metrics</h3>
+                <div id="latencyTable">
+                    <div class="loading">Loading latency data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const metrics = [
+            { name: 'person.retrieval.total', title: 'Person Retrievals', description: 'Total person retrieval operations' },
+            { name: 'person.creation.total', title: 'Person Creations', description: 'Total person creation operations' },
+            { name: 'person.update.total', title: 'Person Updates', description: 'Total person update operations' },
+            { name: 'person.deletion.total', title: 'Person Deletions', description: 'Total person deletion operations' },
+            { name: 'color.retrieval.total', title: 'Color Retrievals', description: 'Total color retrieval operations' },
+            { name: 'color.creation.total', title: 'Color Creations', description: 'Total color creation operations' },
+            { name: 'color.update.total', title: 'Color Updates', description: 'Total color update operations' },
+            { name: 'color.deletion.total', title: 'Color Deletions', description: 'Total color deletion operations' },
+            { name: 'http.server.requests', title: 'HTTP Requests', description: 'Total HTTP requests' }
+        ];
+
+
+        async function fetchMetric(metricName) {
+            try {
+                const response = await fetch(`/actuator/metrics/${metricName}`);
+                const data = await response.json();
+                return data.measurements[0]?.value || 0;
+            } catch (error) {
+                console.error(`Error fetching ${metricName}:`, error);
+                return 'N/A';
+            }
+        }
+
+        async function fetchLatencyMetrics() {
+            try {
+                const response = await fetch('/actuator/metrics/http.server.requests');
+                const data = await response.json();
+                
+                // Group metrics by URI and method
+                const endpointMetrics = {};
+                
+                // Get all measurements for each unique combination of uri and method
+                const uriValues = data.availableTags.find(tag => tag.tag === 'uri')?.values || [];
+                const methodValues = data.availableTags.find(tag => tag.tag === 'method')?.values || [];
+                
+                const endpointData = [];
+                
+                for (const uri of uriValues) {
+                    if (uri === '/**' || uri.includes('actuator')) continue; // Skip wildcard and actuator endpoints
+                    
+                    for (const method of methodValues) {
+                        try {
+                            const metricResponse = await fetch(`/actuator/metrics/http.server.requests?tag=uri:${encodeURIComponent(uri)}&tag=method:${method}`);
+                            const metricData = await metricResponse.json();
+                            
+                            if (metricData.measurements && metricData.measurements.length > 0) {
+                                const count = metricData.measurements.find(m => m.statistic === 'COUNT')?.value || 0;
+                                const totalTime = metricData.measurements.find(m => m.statistic === 'TOTAL_TIME')?.value || 0;
+                                const maxTime = metricData.measurements.find(m => m.statistic === 'MAX')?.value || 0;
+                                
+                                if (count > 0) {
+                                    endpointData.push({
+                                        uri: uri,
+                                        method: method,
+                                        count: count,
+                                        avgTime: (totalTime / count * 1000).toFixed(2), // Convert to milliseconds
+                                        maxTime: (maxTime * 1000).toFixed(2), // Convert to milliseconds
+                                        totalTime: (totalTime * 1000).toFixed(2) // Convert to milliseconds
+                                    });
+                                }
+                            }
+                        } catch (error) {
+                            console.error(`Error fetching metrics for ${uri} ${method}:`, error);
+                        }
+                    }
+                }
+                
+                return endpointData.sort((a, b) => b.count - a.count); // Sort by request count
+            } catch (error) {
+                console.error('Error fetching latency metrics:', error);
+                return [];
+            }
+        }
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Refresh latency data if latency tab is selected
+            if (tabName === 'latency') {
+                refreshLatencyMetrics();
+            }
+        }
+
+        async function refreshLatencyMetrics() {
+            const latencyTable = document.getElementById('latencyTable');
+            latencyTable.innerHTML = '<div class="loading">Loading latency data...</div>';
+            
+            const endpointData = await fetchLatencyMetrics();
+            
+            if (endpointData.length === 0) {
+                latencyTable.innerHTML = '<div class="loading">No latency data available</div>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="endpoint-table">
+                    <thead>
+                        <tr>
+                            <th>Endpoint</th>
+                            <th>Method</th>
+                            <th>Requests</th>
+                            <th>Avg Response Time</th>
+                            <th>Max Response Time</th>
+                            <th>Total Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${endpointData.map(endpoint => `
+                            <tr>
+                                <td><code>${endpoint.uri}</code></td>
+                                <td><span class="status-code status-2xx">${endpoint.method}</span></td>
+                                <td>${endpoint.count}</td>
+                                <td>${endpoint.avgTime} ms</td>
+                                <td>${endpoint.maxTime} ms</td>
+                                <td>${endpoint.totalTime} ms</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            latencyTable.innerHTML = tableHTML;
+        }
+
+        async function refreshMetrics() {
+            const grid = document.getElementById('metricsGrid');
+            grid.innerHTML = '<div class="loading">Loading metrics...</div>';
+            
+            const metricsHTML = await Promise.all(metrics.map(async (metric) => {
+                const value = await fetchMetric(metric.name);
+                return `
+                    <div class="metric-card">
+                        <div class="metric-title">${metric.title}</div>
+                        <div class="metric-value">${value}</div>
+                        <div class="metric-description">${metric.description}</div>
+                    </div>
+                `;
+            }));
+            
+            grid.innerHTML = metricsHTML.join('');
+        }
+
+        // Initial load
+        refreshMetrics();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(refreshMetrics, 30000);
+    </script>
+</body>
+</html>
