@@ -2,7 +2,7 @@
 
 ##  Overview
 
-A comprehensive Spring Boot REST API for managing persons and their favorite colors
+REST API for managing persons and their favorite colors
 
 ##  Key Features
 
@@ -51,29 +51,16 @@ http://localhost:8080/metrics-dashboard.html
 - **Java 25** or higher
 - **Maven 3.9** or higher
 
-### Developer notes
 
-1. **Run the application:**
+### Running the Application:
    ```bash
    mvn spring-boot:run
    ```
 
-### Running Tests
+### Running the Tests
 
 ```bash
-
-# Run tests
 mvn test
-```
-
-### Building the Application
-
-```bash
-# Clean and package
-mvn clean package
-
-# Run the JAR
-java -jar target/assecor-assessment-0.0.1-SNAPSHOT.jar
 ```
 
 ##  Acceptance Criteria Fulfillment
@@ -89,19 +76,19 @@ java -jar target/assecor-assessment-0.0.1-SNAPSHOT.jar
 
 ##  Bonus Features Implemented
 
-- ✅ **Database Normalization**: Separate colors table
-- ✅ **CRUD Operations**: Complete person and color management
-- ✅ **Metrics Dashboard**: Real-time monitoring UI
-- ✅ **Latency Tracking**: Endpoint performance monitoring
-- ✅ **API Documentation**: Swagger UI integration
-- ✅ **Modern UI**: Responsive metrics dashboard
-- ✅ **Comprehensive Logging**: Structured logging with SLF4J
+✅ **Database Normalization**: Separate colors table
+✅ **CRUD Operations**: Complete person and color management
+✅ **Metrics Dashboard**: Real-time monitoring UI
+✅ **Latency Tracking**: Endpoint performance monitoring
+✅ **API Documentation**: Swagger UI integration
+✅ **Modern UI**: Responsive metrics dashboard
+✅ **Comprehensive Logging**: Structured logging with SLF4J
 
 ## Future Enhancements
 
-- **Caching
-- **OAuth2 Security
-- **Integration with company's metrics system + dashboard
+- Caching
+- OAuth2 Security
+- Integration with company's metrics system + dashboard
 
 ## 📝 License
 
