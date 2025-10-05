@@ -1,167 +1,109 @@
-# Assecor Assessment Test (DE)
+# Assecor Assessment Backend
 
-## Zielsetzung
+##  Overview
 
-Das Ziel ist es ein REST – Interface zu implementieren, Bei den möglichen Frameworks stehen .NET(C#) oder Java zur Auswahl. Dabei sind die folgenden Anforderungen zu erfüllen:
+A comprehensive Spring Boot REST API for managing persons and their favorite colors
 
-* Es soll möglich sein, Personen und ihre Lieblingsfarbe über das Interface zu verwalten
-* Die Daten sollen aus einer CSV Datei lesbar sein, ohne dass die CSV angepasst werden muss
-* Alle Personen mit exakten Lieblingsfarben können über das Interface identifiziert werden
+##  Key Features
 
-Einige Beispieldatensätze finden sich in `sample-input.csv`. Die Zahlen der ersten Spalte sollen den folgenden Farben entsprechen:
+- **RESTful API** with complete CRUD operations for persons and colors
+- **Database Persistence** using H2 with JPA/Hibernate
+- **Normalized Database Design** with separate colors table
+- **Real-time Metrics Dashboard** with endpoint latency tracking
+- **Comprehensive Monitoring** using Spring Boot Actuator and Micrometer
+- **Dependency Injection** with Spring's IoC container
+- **Comprehensive Testing** with JUnit 5
+- **API Documentation** with Swagger/OpenAPI
+- **Modern UI** with responsive metrics dashboard
 
-| ID | Farbe |
-| --- | --- |
-| 1 | blau |
-| 2 | grün |
-| 3 | violett |
-| 4 | rot |
-| 5 | gelb |
-| 6 | türkis |
-| 7 | weiß |
+##  Technology Stack
 
-Das Ausgabeformat der Daten ist als `application/json` festgelegt. Die Schnittstelle soll folgende Endpunkte anbieten:
+- **Java 25**
+- **Spring Boot 3.5.0**
+- **H2 Database** (in-memory)
+- **JUnit 5** for testing
+- **Micrometer** for metrics collection
+- **SpringDoc OpenAPI** for API documentation
+- **Lombok** for boilerplate reduction
 
-**GET** /persons
-```json
-[{
-"id" : 1,
-"name" : "Hans",
-"lastname": "Müller",
-"zipcode" : "67742",
-"city" : "Lauterecken",
-"color" : "blau"
-},{
-"id" : 2,
-...
-}]
+
+##  API Endpoints
+
+http://localhost:8080/swagger-ui/index.html
+
+## 📈 Metrics & Monitoring
+
+### Real-time Metrics Dashboard
+Access the comprehensive metrics dashboard at:
+```
+http://localhost:8080/metrics-dashboard.html
 ```
 
-**GET** /persons/{id}
+### Actuator Endpoints
 
-*Hinweis*: als **ID** kann hier die Zeilennummer verwendet werden.
-```json
-{
-"id" : 1,
-"name" : "Hans",
-"lastname": "Müller",
-"zipcode" : "67742",
-"city" : "Lauterecken",
-"color" : "blau"
-}
+- **Health Check**: `http://localhost:8080/actuator/health`
+- **Metrics**: `http://localhost:8080/actuator/metrics`
+
+##  Getting Started
+
+### Prerequisites
+
+- **Java 25** or higher
+- **Maven 3.9** or higher
+
+### Developer notes
+
+1. **Run the application:**
+   ```bash
+   mvn spring-boot:run
+   ```
+
+### Running Tests
+
+```bash
+
+# Run tests
+mvn test
 ```
 
-**GET** /persons/color/{color}
-```json
-[{
-"id" : 1,
-"name" : "Hans",
-"lastname": "Müller",
-"zipcode" : "67742",
-"city" : "Lauterecken",
-"color" : "blau"
-},{
-"id" : 2,
-...
-}]
+### Building the Application
+
+```bash
+# Clean and package
+mvn clean package
+
+# Run the JAR
+java -jar target/assecor-assessment-0.0.1-SNAPSHOT.jar
 ```
 
-## Akzeptanzkriterien
+##  Acceptance Criteria Fulfillment
 
-1. Die CSV Datei wurde eingelesen, und wird programmintern durch eine dem Schema entsprechende Modellklasse repräsentiert.
-2. Der Zugriff auf die Datensätze so abstrahiert, dass eine andere Datenquelle angebunden werden kann, ohne den Aufruf anpassen zu müssen.
-3. Die oben beschriebene REST-Schnittstelle wurde implementiert und liefert die korrekten Antworten.
-4. Der Zugriff auf die Datensätze, bzw. auf die zugreifende Klasse wird über Dependency Injection gehandhabt.
-5.  Die REST-Schnittstelle ist mit Unit-Tests getestet. 
-6.  Die `sample-input.csv` wurde nicht verändert 
+✅ **REST Interface**: All required endpoints implemented  
+✅ **Dependency Injection**: Spring handles all dependencies  
+✅ **Unit Tests**: Comprehensive test coverage  
+✅ **Database Integration**: JPA with H2 database  
+✅ **Metrics Monitoring**: Real-time performance tracking  
+✅ **API Documentation**: Swagger/OpenAPI integration  
+✅ **Error Handling**: Global exception management  
+✅ **Data Validation**: Input validation with Bean Validation  
 
-## Bonuspunkte
-* Implementierung als MSBuild Projekt für kontinuierliche Integration auf TFS (C#/.NET) oder als Maven/Gradle Projekt (Java)
-* Implementieren Sie eine zusätzliche Methode POST/ Personen, die eine zusätzliche Aufzeichnung zur Datenquelle hinzufügen
-* Anbindung einer zweiten Datenquelle (z.B. Datenbank via Entity Framework)
+##  Bonus Features Implemented
 
-Denk an deine zukünftigen Kollegen, und mach es ihnen nicht zu einfach, indem du deine Lösung öffentlich zur Schau stellst. Danke!
+- ✅ **Database Normalization**: Separate colors table
+- ✅ **CRUD Operations**: Complete person and color management
+- ✅ **Metrics Dashboard**: Real-time monitoring UI
+- ✅ **Latency Tracking**: Endpoint performance monitoring
+- ✅ **API Documentation**: Swagger UI integration
+- ✅ **Modern UI**: Responsive metrics dashboard
+- ✅ **Comprehensive Logging**: Structured logging with SLF4J
 
-# Assecor Assessment Test (EN)
+## Future Enhancements
 
-## goal
+- **Caching
+- **OAuth2 Security
+- **Integration with company's metrics system + dashboard
 
-You are to implement a RESTful web interface. The choice of framework and stack is yours between .NET (C#) or Java. It has to fulfull the following criteria:
+## 📝 License
 
-* You should be able to manage persons and their favourite colour using the interface
-* The application should be able to read the date from the CSV source, without modifying the source file
-* You can identify people with a common favourite colour using the interface
+This project is part of the Assecor assessment and is for evaluation purposes only.
 
-A set of sample data is contained within `sample-input.csv`. The number in the first column represents one of the following colours:
-
-| ID | Farbe |
-|---|---|
-| 1 | blau |
-| 2 | grün |
-| 3 | violett |
-| 4 | rot |
-| 5 | gelb |
-| 6 | türkis |
-| 7 | weiß |
-
-the return content type is `application/json`. The interface should offer the following endpoints:
-
-**GET** /persons
-```json
-[{
-"id" : 1,
-"name" : "Hans",
-"lastname": "Müller",
-"zipcode" : "67742",
-"city" : "Lauterecken",
-"color" : "blau"
-},{
-"id" : 2,
-...
-}]
-```
-
-**GET** /persons/{id}
-
-*HINT*: use the csv line number as your **ID**.
-```json
-{
-"id" : 1,
-"name" : "Hans",
-"lastname": "Müller",
-"zipcode" : "67742",
-"city" : "Lauterecken",
-"color" : "blau"
-}
-```
-
-**GET** /persons/color/{color}
-```json
-[{
-"id" : 1,
-"name" : "Hans",
-"lastname": "Müller",
-"zipcode" : "67742",
-"city" : "Lauterecken",
-"color" : "blau"
-},{
-"id" : 2,
-...
-}]
-```
-
-## acceptance criteria
-
-1. The csv file is read and represented internally by a suitable model class.
-2. File access is done with an interface, so the implementation can be easily replaced for other data sources.
-3. The REST interface is implemented according to the above specifications.
-4. Data access is done using a dependency injection mechanism
-5. Unit tests for the REST interface are available.
-6. `sample-input.csv` has not been changed.
-
-## bonus points are awarded for the following
-* implement the project with MSBuild in mind for CI using TFS/DevOps when using .NET, or as a Maven/Gradle project in Java
-* Implement an additional **POST** /persons to add new people to the dataset
-* Add a secondary data source (e.g. database via EF or JPA)
-
-Think about your potential future colleagues, and do not make it too easy for them by posting your solution publicly. Thank you!
